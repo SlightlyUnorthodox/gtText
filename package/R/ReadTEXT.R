@@ -23,7 +23,7 @@
 #   trim.cr:
 #   
 
-ReadTEXT <- function(files, col.name = 'text', delim = '\n', regex = FALSE, skip = 0, 
+ReadTEXT <- function(files, debug = 0, col.name = 'text', delim = '\n', regex = FALSE, skip = 0, 
                         nrows = -1, escape = "\\", trim.cr = FALSE, line.number = FALSE) {
 
 
@@ -74,7 +74,7 @@ ReadTEXT <- function(files, col.name = 'text', delim = '\n', regex = FALSE, skip
     alias <- create.alias("read")
 
     # Initialize GI and run
-    gi <- GI(text:TEXTReader, delim, skip, nrows, escape, trim.cr, line.number)
+    gi <- GI(text:TEXTReader, debug, delim, skip, nrows, escape, trim.cr, line.number)
 
     # Assign attributes
     attributes <- setNames(convert.types(quote(base::STRING)), as.character(col.name))
