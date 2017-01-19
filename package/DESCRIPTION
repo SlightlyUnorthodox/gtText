@@ -1,0 +1,6 @@
+Package: gtTExt
+Title: R interface for the 'text' library in Grokit
+Authors: Dax Gerts <gerts.dax1@gmail.com>
+Description: Front-end interface for Grokit.
+Version: 0.01
+Depends: gtBase
