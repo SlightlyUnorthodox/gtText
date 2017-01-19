@@ -16,7 +16,7 @@
 #   files: character vector of raw text data files to be read. Uses absolute or relative paths to current working session.
 #   col.name: Column name for delimited data returned by ReadTEXT (default = 'text')
 #   delim: Delimiter string used to identify breaks in raw text. (default = '')
-#   regex: Specifies whether to interpret delimiter string as a regular expression. (default = FALSE)
+#   regex: Specifies whether to interpret delimiter string as a php-style regular expression. (default = FALSE)
 #   skip: (from ReadCSV)
 #   nrows: (from READCSV)
 #   escape:
@@ -47,8 +47,8 @@ ReadTEXT <- function(files, debug = 0, col.name = 'text', delim = '\n', regex = 
         "'regex' should be either 'TRUE' or 'FALSE'")
     
     # If regex == FALSE reformat string as readable regex using capture group
-    if regex == TRUE:
-        delim = paste(("(", as.character(delim), ")"), sep = "", collapse = "")
+    if regex == FALSE:
+        delim = paste(c("/\\", as.character(delim), "\\b/i"), sep = "", collapse = "")
     
     # Check assertions for 'skip'
     assert(is.numeric(skip) && length(skip) == 1 && skip >= 0 && skip == floor(skip),
