@@ -11,7 +11,7 @@ function CSVReader( array $t_args, array $output ) {
         $delim_temp = $t_args['delim'];
 
         // Assert that delimiter is string
-        grokit_assert( is_string($delim_temp), "Got " . gettype($delim_temp) " . instead of string for delimiter, 'delim'.");
+        grokit_assert( is_string($delim_temp), "Got " . gettype($delim_temp) . " instead of string for delimiter, 'delim'.");
 
         // Assert that delimiter length is greater than zero
         grokit_assert( \strlen($delim_temp) >= 1, "Expected non-zero delimiter, got string of length" . \strlen($delim_temp) . "> instead.");
@@ -151,7 +151,7 @@ public:
 
 <?
         foreach( $my_output as $name => $type ) {
-            
+?>  
             <?=\grokit\fromStringDict($name, $type, 'it->c_str()')?>;
 
             ++it;
