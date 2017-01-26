@@ -71,7 +71,9 @@ function CSVReader( array $t_args, array $output ) {
         $lineColumn = array_keys($output)[0];
         $my_output = array_slice($output, 1);
     } else {
-        $my_output = $output;
+        $my_output = $output;while( *(ptr++) != '\0' )
+                    ; // Advance past next delimiter
+    <?          }
     }
 
     // Come up with a name for ourselves
@@ -80,7 +82,9 @@ function CSVReader( array $t_args, array $output ) {
 ?>
 
 class <?=$className?> {
-    std::istream& my_stream;
+    std::istream& my_stream;while( *(ptr++) != '\0' )
+                    ; // Advance past next delimiter
+    <?          }
     std::string fileName;
 
     // Template parameters
@@ -88,99 +92,69 @@ class <?=$className?> {
     static constexpr size_t SKIP = <?=$skip?>;
     static constexpr char DELIMITER = '<?=$delim?>';
     static constexpr char ESCAPE = '<?=$escape?>';
-    typedef boost::escaped_list_separator<char> separator;
-    typedef boost::tokenizer< separator > Tokenizer;
-    separator my_separator;
-    Tokenizer my_tokenizer;
 
     // Prevent having to allocate this every time.
     std::string line;
     std::vector<std::string> tokens;
 
+    // Line count & row number
     size_t count;
 
-<?  \grokit\declareDictionaries($my_output); ?>
+    <?  \grokit\declareDictionaries($my_output); ?>
 
-public:
+    public:
 
-    <?=$className?> ( GIStreamProxy& _stream ) :
-        my_stream(_stream.get_stream())
-        , fileName(_stream.get_file_name())
-<?  if( !$simple ) { ?>
-        , my_separator(ESCAPE, DELIMITER, QUOTE_CHAR)
-        , my_tokenizer(std::string(""))
-<?  } ?>
-        , count(0)
-    {
-<?  if( $headerLines > 0 ) { ?>
-        for( size_t i = 0; i < SKIP; ++i ) {
-            FATALIF( !getline( my_stream, line ), "TEXTReader reached end of file before finishing header.\n" );
+        <?=$className?> ( GIStreamProxy& _stream ) :
+            my_stream(_stream.get_stream()),
+            fileName(_stream.get_file_name()),
+            count(0)
+        {
+        <?  if( $skip > 0 ) { ?>
+                for( size_t i = 0; i < SKIP; ++i ) {
+                    FATALIF( !getline( my_stream, line ), "TEXTReader reached end of file before finishing header.\n" );
+                }
+        <?  } // If headerLines > 0 ?>
         }
-<?  } // If headerLines > 0 ?>
-    }
 
 // >
 
-    bool ProduceTuple( <?=typed_ref_args($output)?> ) {
-        if (count < NROWS) { //>
-            count++;
-<?  if ($lineNumber) { ?>
-            <?=$lineColumn?> = count;
-<?  } ?>
-        } else {
-            return false;
-        }
-
-        if( getline( my_stream, line ) ) {
-<?  if( $trimCR ) { ?>
-            if( line.back() == '\r' ) {
-                line.pop_back();
-            }
-<? } // if trimCR ?>
-<?  if( !$simple ) { ?>
-<?      if( $debug >= 1 ) { ?>
-            try {
-<?      } // if debug >= 1 ?>
-            my_tokenizer.assign( line, my_separator );
-<?      if( $debug >= 1 ) { ?>
-            } catch(...) {
-                FATAL("TEXTReader for file %s failed on line: %s", fileName.c_str(), line.c_str());
-            }
-<?      } // if debug >= 1 ?>
-            Tokenizer::iterator it = my_tokenizer.begin();
-
-<?
-        foreach( $my_output as $name => $type ) {
-?>  
-            <?=\grokit\fromStringDict($name, $type, 'it->c_str()')?>;
-
-            ++it;
-<?
-        } // foreach output
-?>
-<?  } // if complex reader
-    else {
-?>
-            for( char & c : line ) {
-                if( c == DELIMITER )
-                    c = '\0';
+        bool ProduceTuple( <?=typed_ref_args($output)?> ) {
+            if (count < NROWS) { //>
+                count++;
+        <?  if ($lineNumber) { ?>
+                    <?=$lineColumn?> = count;
+        <?  } ?>
+            } else {
+                return false;
             }
 
-            const char * ptr = line.c_str();
-<?
-        $first = true;
-        foreach( $my_output as $name => $type ) {
-            if( $first ) {
-                $first = false;
-            }
-            else {
-?>
-            while( *(ptr++) != '\0' )
-                ; // Advance past next delimiter
-<?          } // not first output ?>
+            if( getline( my_stream, line ) ) {
+            <?  if( $trimCR ) { ?>
+                    if( line.back() == '\r' ) {
+                        line.pop_back();
+                    }
+            <? } // if trimCR ?>
+
+                for( char & c : line ) {
+                    if( c == DELIMITER )
+                        c = '\0';
+                }
+
+                const char * ptr = line.c_str();
+            <?
+                $first = true;
+                foreach( $my_output as $name => $type ) {
+                    if( $first ) {
+                        $first = false;
+                    }
+                    else {
+            ?>
+                while( *(ptr++) != '\0' )
+                    ; // Advance past next delimiter
+    <?          } // not first output ?>
 
             <?=\grokit\fromStringDict($name, $type, 'ptr')?>;
-<?      } // foreach output ?>
+        <?      } // foreach output ?>
 <?  } // if simple reader ?>
 
             return true;
@@ -188,9 +162,9 @@ public:
         else {
             return false;
         }
-    }
 
 <?  \grokit\declareDictionaryGetters($my_output); ?>
+
 };
 
 <?
